@@ -28,6 +28,8 @@ public class InputManager : MonoBehaviour
         playerInputActions.Player.Jump.performed += OnJumpPerformed;
 
         playerInputActions.Player.Crouch.performed += OnCrouchPerformed;
+
+        playerInputActions.Player.Dash.performed += OnDashPerformed;
     }
 
     private void OnDisable()
@@ -38,6 +40,8 @@ public class InputManager : MonoBehaviour
         playerInputActions.Player.Jump.performed -= OnJumpPerformed;
 
         playerInputActions.Player.Crouch.performed -= OnCrouchPerformed;
+
+        playerInputActions.Player.Dash.performed -= OnDashPerformed;
 
         playerInputActions.Disable();
     }
@@ -62,5 +66,10 @@ public class InputManager : MonoBehaviour
     private void OnCrouchPerformed(InputAction.CallbackContext obj)
     {
         playerCrouch?.ToggleCrouch();
+    }
+
+    private void OnDashPerformed(InputAction.CallbackContext obj)
+    {
+        playerMovement?.EnableDash();
     }
 }

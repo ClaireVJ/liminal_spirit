@@ -5,6 +5,7 @@ public class GameEventsManager : MonoBehaviour
     public static GameEventsManager instance {  get; private set; }
 
     public PlayerVisualEvents playerVisualEvents;
+    public PlayerSFXEvents playerSFXEvents;
 
     private void Awake()
     {
@@ -17,5 +18,6 @@ public class GameEventsManager : MonoBehaviour
         instance = this;
 
         playerVisualEvents = new PlayerVisualEvents();
+        playerSFXEvents = new PlayerSFXEvents();
     }
 }
