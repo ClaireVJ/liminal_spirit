@@ -8,6 +8,7 @@ public class GameEventsManager : MonoBehaviour
     public PlayerVisualEvents playerVisualEvents;
     public PlayerSoundsEvents playerSFXEvents;
     public PossessionEvents possessionEvents;
+    public GameEvents gameEvents;
 
     private void Awake()
     {
@@ -23,5 +24,6 @@ public class GameEventsManager : MonoBehaviour
         playerVisualEvents = new PlayerVisualEvents();
         playerSFXEvents = new PlayerSoundsEvents();
         possessionEvents = new PossessionEvents();
+        gameEvents = new GameEvents();
     }
 }

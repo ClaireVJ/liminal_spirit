@@ -14,8 +14,11 @@ public class InputManager : MonoBehaviour
     {
         playerInputActions.Enable();
 
-        playerInputActions.Player.Move.performed += OnMovePerformed;
-        playerInputActions.Player.Move.canceled += OnMoveCanceled;
+        playerInputActions.Player.HorizontalMove.performed += OnHorizontalMovePerformed;
+        playerInputActions.Player.HorizontalMove.canceled += OnHorizontalMoveCanceled;
+
+        playerInputActions.Player.VerticalMove.performed += OnVerticalMovePerformed;
+        playerInputActions.Player.VerticalMove.canceled += OnVerticalMoveCanceled;
 
         playerInputActions.Player.Jump.performed += OnJumpPerformed;
 
@@ -24,12 +27,17 @@ public class InputManager : MonoBehaviour
         playerInputActions.Player.Dash.performed += OnDashPerformed;
 
         playerInputActions.Player.Possess.performed += OnPossessPerformed;
+
+        playerInputActions.Player.Pause.performed += OnPausePerformed;
     }
 
     private void OnDisable()
     {
-        playerInputActions.Player.Move.performed -= OnMovePerformed;
-        playerInputActions.Player.Move.canceled -= OnMoveCanceled;
+        playerInputActions.Player.HorizontalMove.performed -= OnHorizontalMovePerformed;
+        playerInputActions.Player.HorizontalMove.canceled -= OnHorizontalMoveCanceled;
+
+        playerInputActions.Player.VerticalMove.performed -= OnVerticalMovePerformed;
+        playerInputActions.Player.VerticalMove.canceled -= OnVerticalMoveCanceled;
 
         playerInputActions.Player.Jump.performed -= OnJumpPerformed;
 
@@ -39,38 +47,95 @@ public class InputManager : MonoBehaviour
 
         playerInputActions.Player.Possess.performed -= OnPossessPerformed;
 
+        playerInputActions.Player.Pause.performed -= OnPausePerformed;
+
         playerInputActions.Disable();
     }
 
-    private void OnMovePerformed(InputAction.CallbackContext obj)
+    private void OnHorizontalMovePerformed(InputAction.CallbackContext obj)
     {
-        Vector2 moveDir = obj.ReadValue<Vector2>();
-        GameEventsManager.instance.playerInputEvents.SendMoveInput(moveDir);
+        if (GameManager.instance.gameIsPaused)
+        {
+            return;
+        }
+
+        float moveInput = obj.ReadValue<float>();
+        GameEventsManager.instance.playerInputEvents.SendHorizontalMoveInput(moveInput);
+    }
+    private void OnHorizontalMoveCanceled(InputAction.CallbackContext obj)
+    {
+        if (GameManager.instance.gameIsPaused)
+        {
+            return;
+        }
+
+        float moveInput = 0f;
+        GameEventsManager.instance.playerInputEvents.SendHorizontalMoveInput(moveInput);
     }
 
-    private void OnMoveCanceled(InputAction.CallbackContext obj)
+    private void OnVerticalMovePerformed(InputAction.CallbackContext obj)
     {
-        Vector2 moveDir = Vector2.zero;
-        GameEventsManager.instance.playerInputEvents.SendMoveInput(moveDir);
+        if (GameManager.instance.gameIsPaused)
+        {
+            return;
+        }
+
+        float moveInput = obj.ReadValue<float>();
+        GameEventsManager.instance.playerInputEvents.SendVerticalMoveInput(moveInput);
+    }
+    private void OnVerticalMoveCanceled(InputAction.CallbackContext obj)
+    {
+        if (GameManager.instance.gameIsPaused)
+        {
+            return;
+        }
+
+        float moveInput = 0f;
+        GameEventsManager.instance.playerInputEvents.SendVerticalMoveInput(moveInput);
     }
 
     private void OnJumpPerformed(InputAction.CallbackContext obj)
     {
+        if (GameManager.instance.gameIsPaused)
+        {
+            return;
+        }
+
         GameEventsManager.instance.playerInputEvents.SendJumpInput();
     }
 
     private void OnCrouchPerformed(InputAction.CallbackContext obj)
     {
+        if (GameManager.instance.gameIsPaused)
+        {
+            return;
+        }
+
         GameEventsManager.instance.playerInputEvents.SendCrouchInput();
     }
 
     private void OnDashPerformed(InputAction.CallbackContext obj)
     {
+        if (GameManager.instance.gameIsPaused)
+        {
+            return;
+        }
+
         GameEventsManager.instance.playerInputEvents.SendDashInput();
     }
 
     private void OnPossessPerformed(InputAction.CallbackContext obj)
     {
+        if (GameManager.instance.gameIsPaused)
+        {
+            return;
+        }
+
         GameEventsManager.instance.playerInputEvents.SendPossessionInput();
+    }
+
+    private void OnPausePerformed(InputAction.CallbackContext obj)
+    {
+        GameEventsManager.instance.playerInputEvents.SendPauseInput();
     }
 }

@@ -3,10 +3,16 @@ using UnityEngine;
 
 public class PlayerInputEvents
 {
-    public event Action<Vector2> OnInputForMove;
-    public void SendMoveInput(Vector2 moveInput)
+    public event Action<float> OnInputForHorizontalMove;
+    public void SendHorizontalMoveInput(float moveInput)
     {
-        OnInputForMove?.Invoke(moveInput);
+        OnInputForHorizontalMove?.Invoke(moveInput);
+    }
+
+    public event Action<float> OnInputForVerticalMove;
+    public void SendVerticalMoveInput(float moveInput)
+    {
+        OnInputForVerticalMove?.Invoke(moveInput);
     }
 
     public event Action OnInputForDash;
@@ -31,5 +37,11 @@ public class PlayerInputEvents
     public void SendPossessionInput()
     {
         OnInputForPossession?.Invoke();
+    }
+
+    public event Action OnInputForPause;
+    public void SendPauseInput()
+    {
+        OnInputForPause?.Invoke();
     }
 }

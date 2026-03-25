@@ -15,19 +15,14 @@ public class FoxMovement : MonoBehaviour
     [SerializeField] private float walkSpeed;
 
     [Header("Dash")]
-    private bool isDashing = false;
-    private bool onDashCooldown = false;
-
-    private Vector2 dashDirection;
     [SerializeField] private float dashForce;
     [SerializeField] private float dashDuration;
     [SerializeField] private float dashCooldown;
 
-    [Header("Jump")]
-    private bool onJumpCooldown = false;
+    private bool isDashing = false;
+    private bool onDashCooldown = false;
 
-    [SerializeField] private float jumpCoolDownDur;
-    [SerializeField] private float jumpForce;
+    private Vector2 dashDirection;
 
     private bool isCrouching = false;
 
@@ -35,9 +30,8 @@ public class FoxMovement : MonoBehaviour
     {
         if (GameEventsManager.instance != null)
         {
-            GameEventsManager.instance.playerInputEvents.OnInputForMove += Move;
+            GameEventsManager.instance.playerInputEvents.OnInputForHorizontalMove += ChangeMoveDir;
             GameEventsManager.instance.playerInputEvents.OnInputForDash += EnableDash;
-            GameEventsManager.instance.playerInputEvents.OnInputForJump += Jump;
             GameEventsManager.instance.playerInputEvents.OnInputForCrouch += Crouch;
         }
     }
@@ -46,9 +40,8 @@ public class FoxMovement : MonoBehaviour
     {
         if (GameEventsManager.instance != null)
         {
-            GameEventsManager.instance.playerInputEvents.OnInputForMove -= Move;
+            GameEventsManager.instance.playerInputEvents.OnInputForHorizontalMove -= ChangeMoveDir;
             GameEventsManager.instance.playerInputEvents.OnInputForDash -= EnableDash;
-            GameEventsManager.instance.playerInputEvents.OnInputForJump -= Jump;
             GameEventsManager.instance.playerInputEvents.OnInputForCrouch -= Crouch;
         }
     }
@@ -56,7 +49,6 @@ public class FoxMovement : MonoBehaviour
     private void Start()
     {
         playerManager = GetComponentInChildren<PlayerManager>();
-        Debug.Log(playerManager);
         rb = GetComponent<Rigidbody2D>();
         rb.linearDamping = 0f;
     }
@@ -93,19 +85,18 @@ public class FoxMovement : MonoBehaviour
         }
     }
 
-
-    private void Move(Vector2 moveInput)
+    private void ChangeMoveDir(float moveInput)
     {
-        moveDirection = new Vector2(moveInput.x, 0f);
+        moveDirection = new Vector2(moveInput, 0f);
         GameEventsManager.instance.playerVisualEvents.PlayMoveOrIdleAnim(moveDirection);
 
-        if (moveInput.x < 0)
+        if (moveInput < 0)
         {
             Vector3 newScale = new Vector3(-1, 1, 1);
             playerManager.transform.localScale = newScale;
             transform.localScale = newScale;
         }
-        else if (moveInput.x > 0)
+        else if (moveInput > 0)
         {
             Vector3 newScale = new Vector3(1, 1, 1);
             playerManager.transform.localScale = newScale;
@@ -123,18 +114,6 @@ public class FoxMovement : MonoBehaviour
             dashDirection = new Vector2(transform.localScale.x, 0f);
 
             StartCoroutine(DashDuration());
-        }
-    }
-
-    private void Jump()
-    {
-        if (!onJumpCooldown && playerManager.GetIsGrounded() && !playerManager.GetUnderPlatform())
-        {
-            rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-            GameEventsManager.instance.playerVisualEvents.PlayJumpAnim();
-
-            onJumpCooldown = true;
-            StartCoroutine(JumpCoolDown());
         }
     }
 
@@ -185,11 +164,6 @@ public class FoxMovement : MonoBehaviour
         rb.AddForce(dragForce, ForceMode2D.Force);
     }
 
-    private IEnumerator JumpCoolDown()
-    {
-        yield return new WaitForSeconds(jumpCoolDownDur);
-        onJumpCooldown = false;
-    }
     private IEnumerator DashDuration()
     {
         yield return new WaitForSeconds(dashDuration);

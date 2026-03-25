@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class BeetleMovement : MonoBehaviour
+public class FrogMovement : MonoBehaviour
 {
     private PlayerManager playerManager;
     private Rigidbody2D rb;
@@ -13,11 +13,18 @@ public class BeetleMovement : MonoBehaviour
     [Header("Speed")]
     [SerializeField] private float walkSpeed;
 
+    [Header("Jump")]
+    private bool onJumpCooldown = false;
+
+    [SerializeField] private float jumpCoolDownDur;
+    [SerializeField] private float jumpForce;
+
     private void OnEnable()
     {
         if (GameEventsManager.instance != null)
         {
-            GameEventsManager.instance.playerInputEvents.OnInputForMove += Move;
+            GameEventsManager.instance.playerInputEvents.OnInputForHorizontalMove += ChangeMoveDir;
+            GameEventsManager.instance.playerInputEvents.OnInputForJump += Jump;
         }
     }
 
@@ -25,7 +32,8 @@ public class BeetleMovement : MonoBehaviour
     {
         if (GameEventsManager.instance != null)
         {
-            GameEventsManager.instance.playerInputEvents.OnInputForMove -= Move;
+            GameEventsManager.instance.playerInputEvents.OnInputForHorizontalMove -= ChangeMoveDir;
+            GameEventsManager.instance.playerInputEvents.OnInputForJump -= Jump;
         }
     }
 
@@ -46,28 +54,40 @@ public class BeetleMovement : MonoBehaviour
     {
         rb.AddForce(moveDirection * walkSpeed, ForceMode2D.Impulse);
 
-        if (playerManager.GetIsGrounded() == true)
+        if (playerManager.GetIsGrounded())
         {
             GroundDrag();
         }
     }
 
-    private void Move(Vector2 moveInput)
+    private void ChangeMoveDir(float moveInput)
     {
-        moveDirection = new Vector2(moveInput.x, 0f);
+        moveDirection = new Vector2(moveInput, 0f);
         GameEventsManager.instance.playerVisualEvents.PlayMoveOrIdleAnim(moveDirection);
 
-        if (moveInput.x < 0)
+        if (moveInput < 0)
         {
             Vector3 newScale = new Vector3(-1, 1, 1);
             playerManager.transform.localScale = newScale;
             transform.localScale = newScale;
         }
-        else if (moveInput.x > 0)
+        else if (moveInput > 0)
         {
             Vector3 newScale = new Vector3(1, 1, 1);
             playerManager.transform.localScale = newScale;
             transform.localScale = newScale;
+        }
+    }
+
+    private void Jump()
+    {
+        if (!onJumpCooldown && playerManager.GetIsGrounded() && !playerManager.GetUnderPlatform())
+        {
+            rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+            GameEventsManager.instance.playerVisualEvents.PlayJumpAnim();
+
+            onJumpCooldown = true;
+            StartCoroutine(JumpCoolDown());
         }
     }
 
@@ -91,5 +111,11 @@ public class BeetleMovement : MonoBehaviour
         // Calculate and apply a counter-force
         var dragForce = -horizontalVelocity * horizontalVelocity.magnitude * dragFactor;
         rb.AddForce(dragForce, ForceMode2D.Force);
+    }
+
+    private IEnumerator JumpCoolDown()
+    {
+        yield return new WaitForSeconds(jumpCoolDownDur);
+        onJumpCooldown = false;
     }
 }
