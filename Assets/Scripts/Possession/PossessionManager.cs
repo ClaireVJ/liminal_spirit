@@ -11,6 +11,9 @@ public class PossessionManager : MonoBehaviour
     [SerializeField] private Transform currentPossessedBeing;
 
     [SerializeField] private GameObject ghostPrefab;
+    [SerializeField] private float managerOffset;
+    [SerializeField] private float instantiateXOffset;
+    [SerializeField] private float instantiateYOffset;
 
     private void Awake()
     {
@@ -100,6 +103,52 @@ public class PossessionManager : MonoBehaviour
         }
     }
 
+    private void PossessObject(Transform possessableTransform)
+    {
+        transform.position = possessableTransform.position - new Vector3(0, managerOffset);
+        transform.parent = possessableTransform;
+
+        if (possessableTransform.TryGetComponent(out IPossessable possessable))
+        {
+            possessable.Possess();
+        }
+
+        currentPossessionMode = PossessionModes.POSSESSED;
+        GameEventsManager.instance.possessionEvents.CompleteTransformation(possessableTransform.gameObject);
+    }
+
+    private void UnposessObject(Transform currentPossessable)
+    {
+        if (currentPossessable.TryGetComponent(out IPossessable possessable))
+        {
+            possessable.UnPossess();
+        }
+
+        currentPossessedBeing = null;
+        transform.parent = null;
+    }
+
+    private void BecomeGhost()
+    {
+        Vector2 instantiatePos = transform.position += GetInstaniateOffset();
+
+        GameObject ghostForm = GameObject.Instantiate(ghostPrefab, instantiatePos, Quaternion.identity);
+
+        transform.position = ghostForm.transform.position - new Vector3(0, managerOffset);
+        transform.parent = ghostForm.transform;
+
+        currentPossessionMode = PossessionModes.NON_POSSESSED;
+        GameEventsManager.instance.possessionEvents.CompleteTransformation(ghostForm);
+    }
+
+    private void DestroyGhost()
+    {
+        GameObject ghostForm = transform.parent.gameObject;
+        transform.parent = null;
+
+        Destroy(ghostForm);
+    }
+
     private Transform GetClosestPossessable()
     {
         Transform chosenPossessable = null;
@@ -131,49 +180,15 @@ public class PossessionManager : MonoBehaviour
         return chosenPossessable;
     }
 
-    private void PossessObject(Transform possessableTransform)
+    private Vector3 GetInstaniateOffset()
     {
-        transform.position = possessableTransform.position;
-        transform.parent = possessableTransform;
+        Vector3 instantiatePos = new Vector3(instantiateXOffset, instantiateYOffset, 0f);
 
-        if (possessableTransform.TryGetComponent(out IPossessable possessable))
+        if (playerManager.GetNearRightWall())
         {
-            possessable.Possess();
+            instantiatePos = new Vector3(-instantiateXOffset, instantiateYOffset, 0f);
         }
 
-        currentPossessionMode = PossessionModes.POSSESSED;
-        GameEventsManager.instance.possessionEvents.CompleteTransformation(possessableTransform.gameObject);
-    }
-
-    private void UnposessObject(Transform currentPossessable)
-    {
-        if (currentPossessable.TryGetComponent(out IPossessable possessable))
-        {
-            possessable.UnPossess();
-        }
-
-        currentPossessedBeing = null;
-        transform.parent = null;
-    }
-
-    private void BecomeGhost()
-    {
-        Vector2 instantiatePos = transform.position += new Vector3(2, 2, 0);
-
-        GameObject ghostForm = GameObject.Instantiate(ghostPrefab, instantiatePos, Quaternion.identity);
-
-        transform.position = ghostForm.transform.position;
-        transform.parent = ghostForm.transform;
-
-        currentPossessionMode = PossessionModes.NON_POSSESSED;
-        GameEventsManager.instance.possessionEvents.CompleteTransformation(ghostForm);
-    }
-
-    private void DestroyGhost()
-    {
-        GameObject ghostForm = transform.parent.gameObject;
-        transform.parent = null;
-
-        Destroy(ghostForm);
+        return instantiatePos;
     }
 }

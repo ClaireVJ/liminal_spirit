@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GameEvents
@@ -13,5 +14,17 @@ public class GameEvents
     public void PauseGame(bool isPaused)
     {
         OnGamePaused?.Invoke(isPaused);
+    }
+
+    public event Action<string, List<string>, float> OnThoughtTriggered;
+    public void TriggerThought(string thoughtID, List<string> thoughts, float thoughtLength)
+    {
+        OnThoughtTriggered?.Invoke(thoughtID, thoughts, thoughtLength);
+    }
+
+    public event Action<string> OnThoughtFinished;
+    public void FinishThought(string thoughtID)
+    {
+        OnThoughtFinished?.Invoke(thoughtID);
     }
 }

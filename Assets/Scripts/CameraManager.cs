@@ -5,7 +5,6 @@ public class CameraManager : MonoBehaviour
 {
     [SerializeField] private Transform playerTransform;
     [SerializeField] private PlayerManager playerManager;
-    private Camera mainCamera;
 
     [Header("Offsets")]
     private float xOffset;
@@ -24,11 +23,7 @@ public class CameraManager : MonoBehaviour
     private bool isFalling;
     [SerializeField] private float fallVelocity;
 
-    private void Awake()
-    {
-        mainCamera = GetComponent<Camera>();
-    }
-
+    // Called after the Update() method. 
     private void LateUpdate()
     {
         if (playerTransform == null)
@@ -36,16 +31,18 @@ public class CameraManager : MonoBehaviour
             return;
         }
 
+        // Transition the X axis offset to the left
         if (playerTransform.localScale.x == -1f)
         {
-            xOffset = Mathf.Lerp(xOffset, -lookAheadDistance, lookSpeed * Time.deltaTime);
-            
+            xOffset = Mathf.Lerp(xOffset, -lookAheadDistance, lookSpeed * Time.deltaTime);            
         }
+        // Transition the X axis offset to the right
         else if(playerTransform.localScale.x == 1f)
         {
             xOffset = Mathf.Lerp(xOffset, lookAheadDistance, lookSpeed * Time.deltaTime);
         }
 
+        // Set where the camera is looking at. Player's current position + offsets (to display more of whats above and in front of the player)
         Vector3 targetPosition = new Vector3
             (
                 playerTransform.position.x + xOffset, 
@@ -53,28 +50,27 @@ public class CameraManager : MonoBehaviour
                 transform.position.z
             );
 
-        if (playerManager != null)
+        // Check if the player is falling
+        if (playerManager != null && playerManager.GetYVelocity() < fallVelocity)
         {
-            if (playerManager.GetYVelocity() < fallVelocity)
-            {
-                isFalling = true;
-            }
+            isFalling = true;
+        }
 
-            if (isFalling)
-            {
-                targetPosition.y = playerTransform.position.y;
+        // If the player is falling, remove the Y axis offset
+        if (isFalling)
+        {
+            targetPosition.y = playerTransform.position.y;
 
-                transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, fallingDamping);
+            transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, fallingDamping);
 
-                if (playerManager.GetIsGrounded() == true)
-                {
-                    isFalling = false;
-                }
-            }
-            else
+            if (playerManager.GetIsGrounded() == true)
             {
-                transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, normalDamping);
+                isFalling = false;
             }
+        }
+        else
+        {
+            transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, normalDamping);
         }
     }
 }

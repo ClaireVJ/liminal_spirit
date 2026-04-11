@@ -46,7 +46,11 @@ public class PossessableFrog : MonoBehaviour, IPossessable
     {
         DisplayPossessPrompt(false);
         frogMovement.enabled = false;
+
+        GameEventsManager.instance.playerVisualEvents.PlayMoveOrIdleAnim(Vector2.zero);
         frogVisual.enabled = false;
+
+        transform.localScale = Vector3.one;
 
         rb.bodyType = RigidbodyType2D.Kinematic;
     }

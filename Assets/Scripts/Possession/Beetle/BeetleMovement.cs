@@ -40,6 +40,14 @@ public class BeetleMovement : MonoBehaviour
             GameEventsManager.instance.playerInputEvents.OnInputForHorizontalMove -= HorizontalMove;
             GameEventsManager.instance.playerInputEvents.OnInputForVerticalMove -= VerticalMove;
         }
+
+        if (rb != null)
+        {
+            horizontalDirection = Vector2.zero;
+            verticalDirection = Vector2.zero;
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+        }
     }
 
     private void HorizontalMove(float moveInput)

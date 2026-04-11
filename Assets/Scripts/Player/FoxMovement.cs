@@ -89,6 +89,7 @@ public class FoxMovement : MonoBehaviour
     {
         moveDirection = new Vector2(moveInput, 0f);
         GameEventsManager.instance.playerVisualEvents.PlayMoveOrIdleAnim(moveDirection);
+        GameEventsManager.instance.playerSFXEvents.PlayWalkSound(moveDirection);
 
         if (moveInput < 0)
         {

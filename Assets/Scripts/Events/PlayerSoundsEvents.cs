@@ -3,9 +3,9 @@ using UnityEngine;
 
 public class PlayerSoundsEvents
 {
-    public event Action OnPlayWalkSound;
-    public void PlayWalkSound()
+    public event Action<Vector2> OnPlayWalkSound;
+    public void PlayWalkSound(Vector2 moveDir)
     {
-        OnPlayWalkSound?.Invoke();
+        OnPlayWalkSound?.Invoke(moveDir);
     }
 }

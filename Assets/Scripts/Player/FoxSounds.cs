@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlayerSounds : MonoBehaviour
+public class FoxSounds : MonoBehaviour
 {
     private AudioSource audioSource;
 
@@ -29,11 +29,16 @@ public class PlayerSounds : MonoBehaviour
         }
     }
 
-    private void PlayWalkSound()
+    private void PlayWalkSound(Vector2 moveDir)
     {
-        if (!audioSource.isPlaying)
+        if (moveDir == Vector2.zero)
         {
-            audioSource.PlayOneShot(walkingSFX);
+            audioSource.Stop();
+        }
+        else
+        {
+            audioSource.clip = walkingSFX;
+            audioSource.Play();
         }
     }
 }

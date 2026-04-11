@@ -35,6 +35,13 @@ public class FrogMovement : MonoBehaviour
             GameEventsManager.instance.playerInputEvents.OnInputForHorizontalMove -= ChangeMoveDir;
             GameEventsManager.instance.playerInputEvents.OnInputForJump -= Jump;
         }
+
+        if (rb != null)
+        {
+            moveDirection = Vector2.zero;
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+        }
     }
 
     private void Start()

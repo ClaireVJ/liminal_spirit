@@ -32,6 +32,7 @@ public class PossessableBeetle : MonoBehaviour, IPossessable
     public void Possess()
     {
         DisplayPossessPrompt(false);
+
         beetleMovement.enabled = true;
         rb.bodyType = RigidbodyType2D.Dynamic;
     }
@@ -39,6 +40,9 @@ public class PossessableBeetle : MonoBehaviour, IPossessable
     public void UnPossess()
     {
         DisplayPossessPrompt(false);
+
+        transform.localScale = Vector3.one;
+
         beetleMovement.enabled = false;
         rb.bodyType = RigidbodyType2D.Kinematic;
     }
