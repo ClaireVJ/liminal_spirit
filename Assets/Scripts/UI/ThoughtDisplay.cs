@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class ThoughtDisplay : MonoBehaviour
 {
+    private const float ANIM_DURATION = 1f;
+
     private Animator animator;
     private TextMeshProUGUI thoughtText;
     private bool hasThought;
@@ -59,7 +61,7 @@ public class ThoughtDisplay : MonoBehaviour
 
             animator.Play("TextFadeOut");
 
-            yield return new WaitForSeconds(thoughtLength);
+            yield return new WaitForSeconds(ANIM_DURATION);
         }
 
         thoughtText.text = null;
